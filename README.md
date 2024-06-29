@@ -15,47 +15,42 @@ Install PySparseMac from here or with pip (soon)
 I have another project that automates a service backup. I decided I wanted to write all of the files to a disk image and compress it in an automated fashion. This is the result, a wrapper around `hdiutil`.
 
 #### create_disk(path, name, size)
+>*creates an uncompressed disk image at specificed location.*
 
-*creates an uncompressed disk image at specificed location.*
-
-path: full path (directory and filename) of uncompressed disk image to be created
-
-name: volume name of the mounted disk image
-
-size: size of uncompressed disk image
+>**path**: full path (directory and filename) of uncompressed disk image to be created
+>**name**: volume name of the mounted disk image
+>**size**: size of uncompressed disk image
 
 #### mount_disk(path)
+>*mount the disk image previously created.*
 
-*mount the disk image previously created.*
-
-path: full path (directory and filename) of uncompressed disk image
-
+>**path**: full path (directory and filename) of uncompressed disk image
 
 #### unmount_disk(vol_id)
+>*unmounts a mounted disk image.*
 
-*unmounts a mounted disk image.*
-
-vol_id: Volume ID of the disk to unmount
+>**vol_id**: Volume ID of the disk to unmount
 
 #### compress_disk(path, name)
+>*creates a compressed ULMO format disk in the same directory as the uncompressed disk.*
 
-*creates a compressed ULMO format disk in the same directory as the uncompressed disk.*
-
-path: full path (directory and filename) of uncompressed disk image to be compressed
-
-name: file name of the new compressed disk image
+>**path**: full path (directory and filename) of uncompressed disk image to be compressed
+>**name**: file name of the new compressed disk image
 
 #### move_final_disk(path, destination_dir)
+>*move compressed disk to different location.*
 
-*move compressed disk to different location.*
-
-path: full path (directory and filename) of compressed disk image to be moved
-
-destination_dir: destination to move disk to
+>**path**: full path (directory and filename) of compressed disk image to be moved
+>**destination_dir**: destination to move disk to
 
 #### demo_it()
+>*runs through the full suite of functions to demonstrate the module.* 
 
-*runs through the full suite of functions to demonstrate the module.* 
+
+
+
+
+
 
 ## Usage/Examples
 
