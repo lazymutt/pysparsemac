@@ -4,15 +4,11 @@
 Handles creation, mounting, and compression of MacOS sparse disk images
 ## Installation
 
-Install PySparseMac from here (***really soon!***) or with pip (***soon***)
+Install PySparseMac from here or with pip (***soon***)
 
 ```bash
   pip install pysparsemac
 ```
-
-> [!NOTE]
->
-> I'm cleaning up the code, making sure it's as easy to use as possible.
 
 ## Documentation
 
@@ -67,7 +63,8 @@ Version | Date | Notes
 0.0.2 | 2024.05.19 | Added types
 0.0.3 | 2024.06.18 | Cleaned up, prepare for Github/PyPI
 0.0.4 | 2024.06.20 | Removed types
-0.0.5 | 2024.06.21 | Error checking
+0.0.5 | 2024.06.28 | Error checking, exceptions
+0.1.0 | 2024.06.29 | Public release
 
 - Docs
 
