@@ -4,11 +4,15 @@
 Handles creation, mounting, and compression of MacOS sparse disk images
 ## Installation
 
-Install PySparseMac from here or with pip (soon)
+Install PySparseMac from here (***really soon!***) or with pip (***soon***)
 
 ```bash
   pip install pysparsemac
 ```
+
+> [!NOTE]
+>
+> I'm cleaning up the code, making sure it's as easy to use as possible.
 
 ## Documentation
 
@@ -45,12 +49,6 @@ I have another project that automates a service backup. I decided I wanted to wr
 
 #### demo_it()
 >*runs through the full suite of functions to demonstrate the module.* 
-
-
-
-
-
-
 
 ## Usage/Examples
 
