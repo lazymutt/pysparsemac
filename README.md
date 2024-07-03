@@ -31,11 +31,10 @@ I have another project that automates a service backup. I decided I wanted to wr
 
 >**vol_id**: Volume ID of the disk to unmount
 
-#### compress_disk(path, name)
+#### compress_disk(path)
 >*creates a compressed ULMO format disk in the same directory as the uncompressed disk.*
 
 >**path**: full path (directory and filename) of uncompressed disk image to be compressed
->**name**: file name of the new compressed disk image
 
 #### move_final_disk(path, destination_dir)
 >*move compressed disk to different location.*
@@ -65,6 +64,7 @@ Version | Date | Notes
 0.0.4 | 2024.06.20 | Removed types
 0.0.5 | 2024.06.28 | Error checking, exceptions
 0.1.0 | 2024.06.29 | Public release
+0.1.1 | 2024.07.03 | reworked suprocess calls, destination path, compressed path synthesis
 
 - Docs
 
