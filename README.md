@@ -17,9 +17,9 @@ I have another project that automates a service backup. I decided I wanted to wr
 #### create_disk(path, name, size)
 >*creates an uncompressed disk image at specificed location.*
 
->**path**: full path (directory and filename) of uncompressed disk image to be created
->**name**: volume name of the mounted disk image
->**size**: size of uncompressed disk image
+>**path**: full path (directory and filename) of uncompressed disk image to be created  
+>**name**: volume name of the mounted disk image  
+>**size**: size of uncompressed disk image  
 
 #### mount_disk(path)
 >*mount the disk image previously created.*
@@ -39,8 +39,8 @@ I have another project that automates a service backup. I decided I wanted to wr
 #### move_final_disk(path, destination_dir)
 >*move compressed disk to different location.*
 
->**path**: full path (directory and filename) of compressed disk image to be moved
->**destination_dir**: destination to move disk to
+>**path**: full path (directory and filename) of compressed disk image to be moved  
+>**destination_dir**: destination to move disk to  
 
 #### demo_it()
 >*runs through the full suite of functions to demonstrate the module.* 
