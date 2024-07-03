@@ -35,6 +35,8 @@ This shouldn't be blank...
 #    0.0.4  2024.06.18      removed types. tjm
 #    0.0.5  2024.06.28      error checking, exceptions. tjm
 #    0.1.0  2024.06.29      public release. tjm
+#    0.1.1  2024.07.01      reworked suprocesses, destination path, tjm
+#                           compressed path
 #
 ################################################################################
 
@@ -55,7 +57,13 @@ This shouldn't be blank...
 #   module packaging?
 #   compressed disk destination_dir --DONE
 #   more error checking
+#   more exception messages
 #   all functions return a dict with success field?!?
+#   remove hardcoded tmp, use location of create_disk path --DONE
+#   better/readable variable, function names in the demo function, make it easier to follow.
+#   add fuction to dispose of uncompressed dmg
+#   how about some comments?!?
+#
 #
 ################################################################################
 
@@ -70,13 +78,14 @@ def create_disk(path, name, size):
 
     Returns result of image creation.
     '''
-    if not os.path.isfile(path + '.sparseimage'):
-        create_proc = subprocess.run(f"/usr/bin/hdiutil create -size {size} -type SPARSE -fs 'APFS' -volname {name} {path}", shell=True, check=True, capture_output=True, encoding='utf-8')
+    path_expanded = pathlib.Path(path + '.sparseimage').expanduser()
 
-        if create_proc.returncode == 0:
-            return create_proc.stdout.split(': ')[-1].rstrip()
-    else:
-        raise FileExistsError(f'{path + ".sparseimage"} exists!')
+    if not os.path.isfile(path_expanded):
+        try:
+            create_proc = subprocess.check_output(["/usr/bin/hdiutil", "create", "-size", size, "-type", "SPARSE", "-fs", "APFS", "-volname", name, path_expanded], encoding='utf-8')
+            return create_proc.rsplit(': ', maxsplit=1)[-1].rstrip()
+        except subprocess.CalledProcessError:
+            print(create_proc.returncode, create_proc.output)
 
     return False
 
@@ -87,45 +96,62 @@ def mount_disk(path):
 
     Returns volume ID and path if the image is mounted successfully.
     '''
-    mount_proc = subprocess.run(f"/usr/bin/hdiutil attach {path}", shell=True, check=True, capture_output=True, encoding='utf-8')
+    try:
+        mount_proc = subprocess.check_output(["/usr/bin/hdiutil", "attach", path], encoding='utf-8')
+        last_line = mount_proc.rsplit('\t\n', maxsplit=1)[-1]
+        volume_items = last_line.split('\t')
 
-    last_line = mount_proc.stdout.split('\t\n')[-1]
-    volume_items = last_line.split('\t')
-    volume_id = volume_items[0].rstrip()
-    volume_path = volume_items[-1].rstrip()
+        volume_id = volume_items[0].rstrip()
+        volume_path = volume_items[-1].rstrip()
 
-    if mount_proc.returncode == 0:
         return {'volume_id': volume_id, 'volume_path': volume_path}
+
+    except subprocess.CalledProcessError:
+        print(mount_proc.returncode, mount_proc.output)
 
     return None
 
 
-def compress_disk(path, name):
+# def compress_disk(path, name):
+def compress_disk(path):
     '''
     Accepts image path and destination compressed dmg name.
 
     Returns path of compressed image (and compression results).
     '''
-    if '.dmg' not in name:
-        name += '.dmg'
 
-    test_destination = pathlib.Path(name).expanduser()
+    # sythesize path for for compressed image
+    compressed_name = path.rsplit('.', maxsplit=1)[:-1][0].split('.')
+    compressed_extension = compressed_name.pop()
+    compressed_name = compressed_name[0] + '+compressed.' + compressed_extension
+
+    if '.dmg' not in compressed_name:
+        compressed_name += '.dmg'
+
+    test_destination = pathlib.Path(compressed_name).expanduser()
     if test_destination.exists():
         raise FileExistsError(f'{test_destination} exists!')
 
-    compress_proc = subprocess.run(f"/usr/bin/hdiutil convert {path} -format ULMO -o {name}", shell=True, check=True, capture_output=True, encoding='utf-8')
-    compress_proc_lines = compress_proc.stdout.split('\n')
+    try:
+        compress_proc = subprocess.check_output(["/usr/bin/hdiutil", "convert", path, "-format", "ULMO", "-o", compressed_name], encoding='utf-8')
 
-    # disk_savings = None
-    compressed_path = None
-    for line in compress_proc_lines:
-        if 'created:' in line:
-            compressed_path = line.split(': ')[-1]
-        # elif 'Savings' in line:
-        #     disk_savings = line.split(': ')[-1]
+        # might want to pull out interesting stats for logging?
+        compress_proc_lines = compress_proc.split('\n')
+        compressed_path = None
 
-    # print(disk_savings, compressed_path)
-    return compressed_path
+        for line in compress_proc_lines:
+            if 'created:' in line:
+                compressed_path = line.split(': ')[-1]
+            # elif 'Savings' in line:
+            #     disk_savings = line.split(': ')[-1]
+
+        # print(disk_savings, compressed_path)
+        return compressed_path
+
+    except subprocess.CalledProcessError:
+        print(compress_proc.returncode, compress_proc.output)
+
+    return None
 
 
 def unmount_disk(vol_id):
@@ -134,10 +160,13 @@ def unmount_disk(vol_id):
 
     Returns result of image creation.
     '''
-    unmount_proc = subprocess.run(f"/usr/bin/hdiutil detach {vol_id}", shell=True, check=True, capture_output=True, encoding='utf-8')
-
-    if unmount_proc.returncode == 0:
+    try:
+        unmount_proc = subprocess.check_output(["/usr/bin/hdiutil", "detach", vol_id], encoding='utf-8')
         return True
+
+    except subprocess.CalledProcessError:
+        # pysparsemac/pysparsemac.py:167:14: E0601: Using variable 'unmount_proc' before assignment (used-before-assignment)
+        print(unmount_proc.returncode, unmount_proc.output)
 
     return False
 
@@ -149,14 +178,19 @@ def move_final_disk(path, destination_dir):
     Returns results of move.
     '''
     destination_file = path.split('/')[-1]
-    test_destination = pathlib.Path(f'{destination_dir}/{destination_file}').expanduser()
+    destination_path = pathlib.Path(destination_dir).expanduser()
+    test_destination = pathlib.Path(f'{destination_path}/{destination_file}')
 
     if test_destination.exists():
         raise FileExistsError(f'{test_destination} exists!')
 
-    move_proc = subprocess.run(f"/bin/mv -n {path} {destination_dir}", shell=True, check=True, capture_output=True, encoding='utf-8')
-    if move_proc.returncode == 0:
+    try:
+        move_proc = subprocess.check_output(["/bin/mv", "-n", path, destination_path], encoding='utf-8')
         return True
+
+    except subprocess.CalledProcessError:
+        # pysparsemac/pysparsemac.py:190:14: E0601: Using variable 'move_proc' before assignment (used-before-assignment)
+        print(move_proc.returncode, move_proc.output)
 
     return False
 
@@ -165,7 +199,13 @@ def demo_it():
     '''
     Provides a demonstration usage example.
     '''
-    new_disk_path = create_disk('/tmp/test_sparse.dmg', 'test_sparse_disk', '700m')
+
+#   Do a better job with your variable names here.
+#   Do a better job with your variable names here.
+#   Do a better job with your variable names here.
+#   Do a better job with your variable names here.
+
+    new_disk_path = create_disk('~/test_sparse.dmg', 'test_sparse_disk', '70m')
 
     if new_disk_path:
         print('Successfully created sparse disk.')
@@ -175,9 +215,7 @@ def demo_it():
             print('Successfully mounted volume.')
 
             #
-            #   Write data to disk now.
-            #   Write data to disk now.
-            #   Write data to disk now.
+            #   Write your data to the disk now.
             #
 
             unmount_success = unmount_disk(volume_info['volume_id'])
@@ -186,7 +224,7 @@ def demo_it():
             else:
                 print('Error unmounting disk.')
 
-            compressed_path = compress_disk(new_disk_path, '/tmp/compressed_test')
+            compressed_path = compress_disk(new_disk_path)
             if compressed_path:
                 print('Successfully compressed disk.')
             else:
@@ -201,6 +239,7 @@ def demo_it():
             print('Failed to mount disk.')
     else:
         print("Failed to create disk, or disk exists.")
+
 
 def main():
     '''
