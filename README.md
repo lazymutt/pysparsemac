@@ -10,6 +10,7 @@ Install PySparseMac from here or with pip (***soon***)
   pip install pysparsemac
 ```
 
+
 ## Documentation
 
 I have another project that automates a service backup. I decided I wanted to write all of the files to a disk image and compress it in an automated fashion. This is the result, a wrapper around `hdiutil`.
@@ -45,6 +46,7 @@ I have another project that automates a service backup. I decided I wanted to wr
 #### demo_it()
 >*runs through the full suite of functions to demonstrate the module.* 
 
+
 ## Usage/Examples
 
 ```python
@@ -54,7 +56,7 @@ pysparsemac.demo_it()
 ```
 
 
-## Roadmap
+## Release Notes
 
 Version | Date | Notes
 ------- | ---- | -----
@@ -66,9 +68,19 @@ Version | Date | Notes
 0.1.0 | 2024.06.29 | Public release
 0.1.1 | 2024.07.03 | reworked suprocess calls, destination path, compressed path synthesis
 
-- Docs
 
-- Add more integrations(?)
+## Road Map
+
+Things to do...
+- [ ]  Docs
+- [ ]  PyPI
+- [ ]  more error checking
+- [ ]  more exception messages
+- [ ]  more comments
+- [ ]  functions return dict with success field, etc
+- [ ]  function to dispose of uncompressed image
+- [ ]  better function names, more readable variables in the demo function, make it easier to follow
+- [ ]  Add more integrations(?)
 
 
 ## License
