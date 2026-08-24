@@ -72,6 +72,7 @@ Version | Date | Notes
 ## Road Map
 
 Things to do...
+- [ ]  `hdiutil` is deprecated after Golden Gate? Migrate to `diskutil`?
 - [ ]  Docs
 - [ ]  PyPI
 - [ ]  more error checking
